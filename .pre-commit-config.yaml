@@ -1,0 +1,36 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-added-large-files
+      - id: mixed-line-ending
+  - repo: local
+    hooks:
+      - id: forbid-build-artifacts
+        name: Prevent committing build artifacts
+        entry: bash -c 'if git diff --cached --name-only | grep -E "(dist/|build/|\\.egg-info|\\.venv)"; then echo "Remove build artifacts from commit"; exit 1; fi'
+        language: system
+        pass_filenames: false
+      - id: ruff
+        name: ruff
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+
+      - id: ruff-format
+        name: ruff-format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types: [python]
