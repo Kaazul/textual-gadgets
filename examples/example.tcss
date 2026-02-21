@@ -1,0 +1,31 @@
+Screen {
+    align: center middle;
+}
+
+#menu {
+    width: 40;
+    height: auto;
+    padding: 2;
+    border: round $accent;
+    background: $panel;
+}
+
+#menu Button {
+    margin: 1 0;
+    width: 100%;
+}
+
+Button:focus {
+    color: greenyellow;
+    text-style: bold;
+}
+
+Button:hover {
+    color: greenyellow;
+    text-style: bold;
+}
+
+#app-body {
+    height: 1fr;
+    layout: vertical;
+}
