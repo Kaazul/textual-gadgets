@@ -18,11 +18,13 @@ dependencies = [
 [dependency-groups]
 dev = [
     "hatchling>=1.28.0",
-    "mypy>=1.19.1",
     "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "ruff>=0.15.1",
 ]
+
+[tool.uv]
+package = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/textual_gadgets"]

@@ -8,4 +8,6 @@ and this project (more or less) adheres to [Semantic Versioning](https://semver.
 ## [0.1.0] - 2026-02-18
 
 ### Added:
+- screens: QuestionScreen, PlaceholderScreen
+- Example App displaying the screens
 - Changelog
