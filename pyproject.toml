@@ -12,6 +12,7 @@ authors = [
     { name = "Kaazul", email = "kaazul@pm.me" }
 ]
 dependencies = [
+    "email-validator>=2.3.0",
     "textual>=7.5.0",
 ]
 

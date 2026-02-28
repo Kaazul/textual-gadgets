@@ -2,12 +2,63 @@
 
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Vertical
+from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
-from textual.widgets import Button, Footer, Header
+from textual.widgets import Button, Footer, Header, Label, Static
 
 from textual_gadgets._utils.utils import get_version
-from textual_gadgets.screens import PlaceholderScreen, QuestionScreen
+from textual_gadgets.modal_screens import UserInputScreen, YesNoScreen
+from textual_gadgets.screens import PlaceholderScreen
+from textual_gadgets.validators import IPv4Validator
+
+
+class InputExampleScreen(Screen):
+    CSS = """
+    InputExampleScreen {
+        Static {
+            width: 70%;
+        }
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        yield Label("Screen for testing UserInput Screen")
+        with Horizontal():
+            yield Static("UserInputScreen vwith max length=30")
+            yield Button("Short Greeting", id="greeting")
+        with Horizontal():
+            yield Static("Default value and IPv4Validator")
+            yield Button("Enter IP", id="ip")
+        with Horizontal():
+            yield Static("Placeholder")
+            yield Button("Enter EMail", id="mail")
+        yield Label("Submitted User Result", id="result")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "greeting":
+            self.app.push_screen(
+                UserInputScreen(
+                    message="Enter a short greeting!\nHover over the input field to get help.",
+                    input_max_length=30,
+                    input_tooltip="A maximum length of 30 characters is allowed.",
+                ),
+                self.get_user_input,
+            )
+        elif event.button.id == "ip":
+            self.app.push_screen(
+                UserInputScreen(
+                    message="Enter IP address",
+                    input_validators=IPv4Validator(),
+                    input_validate_on=["submitted", "blur"],
+                ),
+                self.get_user_input,
+            )
+        elif event.button.id == "mail":
+            pass
+
+    def get_user_input(self, value: str) -> None:
+        label = self.query_one("#result", Label)
+        label.content = value
 
 
 class MainScreen(Screen):
@@ -17,7 +68,8 @@ class MainScreen(Screen):
         yield Header(show_clock=True)
         with Vertical(id="menu"):
             yield Button("PlaceHolder Screen", id="placeholder")
-            yield Button("Quit", id="quit_button")
+            yield Button("User Input Examples", id="user_input")
+            yield Button("Quit", id="quit_button", variant="error")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -38,11 +90,12 @@ class MainScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
-
         if button_id == "placeholder":
             self.app.push_screen(PlaceholderScreen())
         elif button_id == "quit_button":
             self.app.action_request_quit()
+        elif button_id == "user_input":
+            self.app.push_screen(InputExampleScreen())
         else:
             self.app.push_screen(PlaceholderScreen(title=event.button.label))
 
@@ -79,11 +132,17 @@ class ExampleApp(App):
                 self.exit()
 
         self.push_screen(
-            QuestionScreen(
-                "Do you really want to quit?", yes_variant="error", no_variant="primary"
-            ),
+            YesNoScreen("Do you really want to quit?", yes_variant="error", no_variant="primary"),
             check_quit,
         )
+
+    def action_get_user_input(self) -> None:
+        """Displays the User input screen"""
+
+        def notify_user_input(value: str) -> None:
+            self.notify(value, timeout=5)
+
+        self.push_screen(UserInputScreen(), notify_user_input)
 
 
 if __name__ == "__main__":
